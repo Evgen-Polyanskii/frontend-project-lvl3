@@ -1,0 +1,16 @@
+root: true
+
+env:
+  node: true
+  jest: true
+  browser: true
+
+parserOptions:
+  ecmaVersion: 2020
+
+extends:
+  - "airbnb-base"
+
+rules:
+  no-console: 0
+  import/extensions: 0
