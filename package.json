@@ -20,6 +20,7 @@
   "homepage": "https://github.com/Evgen-Polyanskii/frontend-project-lvl3#readme",
   "dependencies": {
     "bootstrap": "^5.2.0-beta1",
+    "i18next": "^21.8.7",
     "lodash": "^4.17.21",
     "mini-css-extract-plugin": "^2.6.0",
     "on-change": "^4.0.1",
