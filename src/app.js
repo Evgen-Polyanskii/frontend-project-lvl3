@@ -4,7 +4,7 @@ import _ from 'lodash';
 import i18next from 'i18next';
 import parseRSS from './parseRSS';
 import { getConfig } from './confige';
-import installWatchedState from './view.js';
+import { installWatchedState, applyTranslations } from './view.js';
 import locales from './locales/ru.js';
 
 const getElements = (obj) => _.mapValues(obj, (selector) => document.querySelector(selector));
@@ -57,6 +57,33 @@ const loadRss = (state, url) => {
     });
 };
 
+const fetchUpdates = (state) => {
+  const promises = state.feeds.map((feed) => axios
+    .get(decorateUrlWithProxy(feed.url), { timeout: getConfig('RSS_LOAD_TIMEOUT') })
+    .then(({ data }) => {
+      const { items } = parseRSS(data.contents);
+      const newPosts = items.map((item) => ({ ...item, channelId: feed.id }));
+      const oldPosts = state.posts.filter((post) => post.channelId === feed.id);
+      return _.differenceWith(newPosts, oldPosts, (p1, p2) => p1.link === p2.link)
+        .map((post) => ({ ...post, id: _.uniqueId() }));
+    })
+    .catch((e) => {
+      // eslint-disable-next-line no-console
+      console.log(e);
+    }));
+
+  Promise.all(promises)
+    .then((data) => {
+      const posts = data.flat();
+      if (posts.length > 0) {
+        state.posts.unshift(...posts);
+      }
+    })
+    .finally(() => {
+      setTimeout(() => fetchUpdates(state), getConfig('RSS_UPDATE_TIMEOUT'));
+    });
+};
+
 export default () => {
   const initState = {
     form: {
@@ -78,6 +105,10 @@ export default () => {
     submit: '.rss-form button[type="submit"]',
     feeds: '.feeds',
     posts: '.posts',
+    h1: 'h1',
+    lead: '.lead',
+    example: '.text-white-50',
+    label: '.rss-form label[for="url-input"]',
   });
 
   i18next.init({
@@ -85,7 +116,9 @@ export default () => {
     debug: true,
     resources: locales,
   }).then((translate) => {
+    applyTranslations(elements, translate);
     const state = installWatchedState(elements, initState, translate);
+
     elements.form.addEventListener('submit', (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
@@ -108,5 +141,7 @@ export default () => {
           }
         });
     });
+
+    setTimeout(() => fetchUpdates(state), getConfig('RSS_UPDATE_TIMEOUT'));
   });
 };

@@ -104,9 +104,15 @@ const handlers = {
   'loadingProcess.status': handleLoadingProcess,
 };
 
-const installWatchedState = (elements, state, translate) => (onChange(
+export const installWatchedState = (elements, state, translate) => (onChange(
   state,
   (path) => handlers[path]?.(elements, state, translate),
 ));
 
-export default installWatchedState;
+export const applyTranslations = (elements, translate) => {
+  elements.h1.innerText = translate('h1');
+  elements.lead.innerText = translate('lead');
+  elements.example.innerText = translate('example');
+  elements.submit.innerText = translate('submit');
+  elements.label.innerText = translate('label');
+};

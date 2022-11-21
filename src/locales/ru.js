@@ -15,6 +15,11 @@ export default {
       feeds: 'Фиды',
       posts: 'Посты',
       preview: 'Просмотр',
+      h1: 'RSS агрегатор',
+      lead: 'Начните читать RSS сегодня! Это легко, это красиво.',
+      example: 'Пример: https://ru.hexlet.io/lessons.rss',
+      label: 'ссылка RSS',
+      submit: 'Добавить',
     },
   },
 };
