@@ -62,7 +62,7 @@ const handleFeeds = (elements, state, translate) => {
   feedsEl.innerHTML = `
     <div class="card border-0">
         <div class="card-body">
-            <h2 class="card-title h4">${translate('feeds')}</h2>
+            <h2 class="card-title h4">${translate('elements.feeds')}</h2>
         </div>
         <ul class="list-group rounded-0">
             ${feeds.map(({ title, description }) => (`
@@ -78,18 +78,30 @@ const handleFeeds = (elements, state, translate) => {
 
 const handlePosts = (elements, state, translate) => {
   const { posts: postsEl } = elements;
-  const { posts } = state;
+  const { posts, ui } = state;
   postsEl.innerHTML = `
     <div class="card border-0">
         <div class="card-body">
-            <h2 class="card-title h4">${translate('posts')}</h2>
+            <h2 class="card-title h4">${translate('elements.posts')}</h2>
         </div>
         <ul class="list-group border-0 rounded-0">
           ${posts.map((post) => (`
             <li class="list-group-item d-flex justify-content-between align-items-start border-0 border-end-0">
-              <a class="fw-bold" href="${post.link}" data-id="${post.id} rel="noopener noreferrer" target="_blank">
+              <a
+                class=${(ui.seenPosts.has(post.id)) ? '"fw-normal link-secondary"' : 'fw-bold'}
+                href="${post.link}"
+                data-id="${post.id}"
+                rel="noopener noreferrer"
+                target="_blank">
                 ${post.title}
               </a>
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                data-id="${post.id}"
+                data-bs-toggle="modal"
+                data-bs-target="#modal"
+              >${translate('elements.preview')}</button>
             </li>
           `)).join('\n')}
         </ul>
@@ -97,11 +109,27 @@ const handlePosts = (elements, state, translate) => {
   `;
 };
 
+const handlePreviewPost = (elements, state) => {
+  const post = state.posts.find(({ id }) => id === state.modal.postId);
+
+  if (!post) return;
+
+  const title = elements.modal.querySelector('#modalLabel');
+  const body = elements.modal.querySelector('.modal-body');
+  const articleLink = elements.modal.querySelector('.full-article');
+
+  title.textContent = post.title;
+  body.textContent = post.description;
+  articleLink.href = post.link;
+};
+
 const handlers = {
   form: handleForm,
   feeds: handleFeeds,
   posts: handlePosts,
   'loadingProcess.status': handleLoadingProcess,
+  'ui.seenPosts': handlePosts,
+  'modal.postId': handlePreviewPost,
 };
 
 export const installWatchedState = (elements, state, translate) => (onChange(
@@ -110,9 +138,11 @@ export const installWatchedState = (elements, state, translate) => (onChange(
 ));
 
 export const applyTranslations = (elements, translate) => {
-  elements.h1.innerText = translate('h1');
-  elements.lead.innerText = translate('lead');
-  elements.example.innerText = translate('example');
-  elements.submit.innerText = translate('submit');
-  elements.label.innerText = translate('label');
+  elements.h1.innerText = translate('elements.h1');
+  elements.lead.innerText = translate('elements.lead');
+  elements.example.innerText = translate('elements.example');
+  elements.submit.innerText = translate('elements.submit');
+  elements.label.innerText = translate('elements.label');
+  elements.modalClose.innerText = translate('elements.close');
+  elements.modalReadAll.innerText = translate('elements.reedMore');
 };

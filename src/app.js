@@ -1,3 +1,4 @@
+import 'bootstrap';
 import * as yup from 'yup';
 import axios from 'axios';
 import _ from 'lodash';
@@ -75,7 +76,7 @@ const fetchUpdates = (state) => {
   Promise.all(promises)
     .then((data) => {
       const posts = data.flat();
-      if (posts.length > 0) {
+      if (posts[0] && posts.length > 0) {
         state.posts.unshift(...posts);
       }
     })
@@ -96,6 +97,12 @@ export default () => {
     },
     feeds: [],
     posts: [],
+    modal: {
+      postId: null,
+    },
+    ui: {
+      seenPosts: new Set(),
+    },
   };
 
   const elements = getElements({
@@ -109,6 +116,9 @@ export default () => {
     lead: '.lead',
     example: '.text-white-50',
     label: '.rss-form label[for="url-input"]',
+    modal: '#modal',
+    modalReadAll: '#modal .full-article',
+    modalClose: '#modal .modal-footer [data-bs-dismiss=modal]',
   });
 
   i18next.init({
@@ -140,6 +150,14 @@ export default () => {
             };
           }
         });
+    });
+
+    elements.posts.addEventListener('click', (e) => {
+      if (!_.has(e.target.dataset, 'id')) return;
+
+      const { id } = e.target.dataset;
+      state.ui.seenPosts.add(id);
+      state.modal.postId = String(id);
     });
 
     setTimeout(() => fetchUpdates(state), getConfig('RSS_UPDATE_TIMEOUT'));

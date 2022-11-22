@@ -3,10 +3,7 @@
 root: true
 
 plugins:
-  - jest
   - functional
-  - testing-library
-  - jest-dom
 
 env:
   jest: true
@@ -18,10 +15,8 @@ parserOptions:
 
 extends:
   - 'airbnb-base'
-  - 'plugin:jest/recommended'
   - 'plugin:functional/external-recommended'
   - 'plugin:functional/recommended'
-  - 'plugin:jest-dom/recommended'
 
 rules:
   import/extensions: 0
