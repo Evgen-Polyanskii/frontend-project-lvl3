@@ -121,7 +121,7 @@ export default () => {
     modalClose: '#modal .modal-footer [data-bs-dismiss=modal]',
   });
 
-  i18next.init({
+  i18next.createInstance().init({
     lng: 'ru',
     debug: true,
     resources: locales,
